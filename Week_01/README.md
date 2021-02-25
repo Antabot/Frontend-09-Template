@@ -13,3 +13,12 @@
 技巧：二维数组展平、高效克隆
 
 算法：递归 AI、胜负剪枝
+
+### 异步编程
+
+三种方案：
+- callback，JS 初期唯一异步方案，代码复杂，效率低
+- Promise，then 中返回 Promise 实现链式表达
+- async/await，早年用 generator + yeild 模拟
+
+async + generator 可实现异步迭代器，对应 `for await of` 语法
