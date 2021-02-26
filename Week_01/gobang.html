@@ -2,13 +2,13 @@
     #board {
         width: 800px;
         margin: auto;
-        top: 100px;
+        top: 40px;
         position: relative;
     }
     #virtual-board {
         width: 800px;
         margin: auto;
-        top: -480px;
+        top: -540px;
         left: -20px;
         position: relative;
     }
@@ -41,13 +41,29 @@
 </style>
 
 <body>
+    <button onclick="computerFirst();">电脑先手</button>
+    <button onclick="playerFirst();">玩家先手</button>
     <div id="board"></div>
     <div id="virtual-board"></div>
 </body>
 
 <script>
     let pattern = new Array(255).fill(0);
+    // pattern[112] = 0;
     let color = 1;
+
+    function computerFirst() {
+        pattern = new Array(255).fill(0);
+        pattern[112] = 1;
+        color = 2;
+        show();
+    }
+
+    function playerFirst() {
+        pattern = new Array(255).fill(0);
+        color = 1;
+        show();
+    }
 
     function showBoard() {
         let board = document.getElementById("board");
@@ -85,19 +101,35 @@
     function userMove(x, y) {
         pattern[y * 15 + x] = color;
         show();
-        if(check(pattern, color, y, x)) {
-            alert(color == 2 ? "⚪ is winner!" : "⚫ is winner!")
+        if(check(5, pattern, color, y, x)) {
+            alert(color == 2 ? "⚪ is winner!" : "⚫ is winner!");
+            return;
         }
         color = 3 - color;
-        if(willWin(pattern,color)) {
-            console.log(color == 2 ?  "⚪ will win!" : "⚫ will win!")
-        }
-        // computerMove();
-        // console.log(bestChoice(pattern, color));
+        // if(willWin(pattern,color)) {
+        //     console.log(color == 2 ?  "⚪ will win!" : "⚫ will win!")
+        // }
+
+        computerMove(x, y);
+        // console.log(bestChoice(pattern, color, y, x));
     }
 
-    // 无需遍历棋盘，只判断落子位的四个方向即可
-    function check(pattern, color, y , x) {
+    function computerMove(userX, userY) {
+        let choice = bestChoice(pattern, color, userY, userX);
+        if(choice.point) pattern[choice.point[1] * 15 + choice.point[0]] = color;
+        if(check(5, pattern, color, choice.point[1], choice.point[0])) {
+            alert(color == 2 ? "⚪ is winner!" : "⚫ is winner!");
+        }
+        color = 3 - color;
+        show();
+    }
+
+
+    /**
+     * 无需遍历棋盘，只判断落子位的四个方向即可
+     * @param {number} target 连子数量
+     */
+    function check(target, pattern, color, y , x) {
         // 判断列
         {
             let count = 1;
@@ -107,7 +139,7 @@
                 if(pattern[i * 15 + j] === color) {
                     count++;
                     // console.log(count);
-                    if(count === 5) return true;
+                    if(count === target) return true;
                     i++;
                 } else break;
             }
@@ -118,7 +150,7 @@
                 if(pattern[i * 15 + j] === color) {
                     count++;
                     // console.log(count);
-                    if(count === 5) return true;
+                    if(count === target) return true;
                     i--;
                 } else break;
             }
@@ -134,7 +166,7 @@
                 if(pattern[i * 15 + j] === color) {
                     count++;
                     // console.log(count);
-                    if(count === 5) return true;
+                    if(count === target) return true;
                     j++;
                 } else break;
             }
@@ -144,7 +176,7 @@
             while(j >= 0) {
                 if(pattern[i * 15 + j] === color) {
                     count++;
-                    if(count === 5) return true;
+                    if(count === target) return true;
                     j--;
                 } else break;
             }
@@ -158,7 +190,7 @@
             while(i < 15 && j < 15) {
                 if(pattern[i * 15 + j] === color) {
                     count++;
-                    if(count === 5) return true;
+                    if(count === target) return true;
                     i++;
                     j++;
                 } else break;
@@ -170,7 +202,7 @@
             while(i >= 0 && j >= 0) {
                 if(pattern[i * 15 + j] === color) {
                     count++;
-                    if(count === 5) return true;
+                    if(count === target) return true;
                     i--;
                     j--;
                 } else break;
@@ -185,7 +217,7 @@
             while(i < 15 && j >= 0) {
                 if(pattern[i * 15 + j] === color) {
                     count++;
-                    if(count === 5) return true;
+                    if(count === target) return true;
                     i++;
                     j--;
                 } else break;
@@ -197,7 +229,7 @@
             while(i >= 0 && j < 15) {
                 if(pattern[i * 15 + j] === color) {
                     count++;
-                    if(count === 5) return true;
+                    if(count === target) return true;
                     i--;
                     j++;
                 } else break;
@@ -214,20 +246,103 @@
     function willWin(pattern, color) {
         for(let i = 0; i < 15; i++) {
             for(let j = 0; j < 15; j++) {
+                if(pattern[i * 15 + j]) continue;
                 let tmp = clone(pattern);
                 tmp[i * 15 + j] = color;
-                if(check(tmp, color, i, j)) return [j, i];
+                if(check(5, tmp, color, i, j)) return [j, i];
             }
         }
         return null;
     }
 
-    // TODO: AI 完善
-    function bestChoice(pattern, color) {
-
+    function willWinInTwoSteps(pattern, color) {
+        for(let i = 0; i < 15; i++) {
+            for(let j = 0; j < 15; j++) {
+                if(pattern[i * 15 + j]) continue;
+                let tmp = clone(pattern);
+                tmp[i * 15 + j] = color;
+                if(check(4, tmp, color, i, j)) return [j, i];
+            }
+        }
+        return null;
     }
 
-    // console.log(bestChoice(pattern, color));
+    function willWinInThreeSteps(pattern, color) {
+        for(let i = 0; i < 15; i++) {
+            for(let j = 0; j < 15; j++) {
+                if(pattern[i * 15 + j]) continue;
+                let tmp = clone(pattern);
+                tmp[i * 15 + j] = color;
+                if(check(3, tmp, color, i, j)) return [j, i];
+            }
+        }
+        return null;
+    }
+
+    // 初步 AI，落子范围 3 * 3，围堵 3 连子
+    function bestChoice(pattern, color, y, x) {
+        let p;
+
+        // 对方要赢时直接落子抢占，result 值其实无用
+        if(p = willWin(pattern, 3 - color)) {
+            return {
+                point: p,
+                result: 3
+            }
+        }
+
+        // 对方三连子时落子抢占
+        if(p = willWinInTwoSteps(pattern, 3 - color)) {
+            return {
+                point: p,
+                result: 2
+            }
+        }
+
+        if(p = willWin(pattern, color)) {
+            return {
+                point: p,
+                result: 3
+            }
+        }
+
+        if(p = willWinInTwoSteps(pattern, color)) {
+            return {
+                point: p,
+                result: 2
+            }
+        }
+
+        if(p = willWinInThreeSteps(pattern, color)) {
+            return {
+                point: p,
+                result: 1
+            }
+        }
+
+        let result = -4;
+        let point = null;
+        outer:for(let i = y - 1; i < y + 2; i++) {
+            for(let j = x - 1; j < x + 2; j++) {
+                if(i < 0 || j < 0 || i >= 15 || j >= 15) continue;
+                if(pattern[i * 15 + j]) continue;
+                let tmp = clone(pattern);
+                tmp[i * 15 + j] = color;
+                let r = bestChoice(tmp, 3 - color, y, x).result;
+                if(-r >= result) {
+                    result = -r;
+                    point = [j, i];
+                }
+                if(result == 1) break outer;
+            }
+        }
+
+        return {
+            point: point,
+            result: point ? result : 0
+        }
+    }
+
     showBoard();
     show();
 </script>
