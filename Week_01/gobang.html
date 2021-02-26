@@ -1,0 +1,233 @@
+<style>
+    #board {
+        width: 800px;
+        margin: auto;
+        top: 100px;
+        position: relative;
+    }
+    #virtual-board {
+        width: 800px;
+        margin: auto;
+        top: -480px;
+        left: -20px;
+        position: relative;
+    }
+    .cell {
+        width: 40px;
+        height: 40px;
+        background-color: white;
+        display: inline-block;
+        border: solid 1px black;
+        vertical-align: middle;
+
+        line-height: 40px;
+        font-size: 20px;
+        text-align: center;
+        box-sizing:border-box
+    }
+    .cross {
+        width: 40px;
+        height: 40px;
+        background-color: transparent;
+        display: inline-block;
+        /* border: solid 1px black; */
+        vertical-align: middle;
+
+        line-height: 40px;
+        font-size: 20px;
+        text-align: center;
+        box-sizing:border-box
+    }
+</style>
+
+<body>
+    <div id="board"></div>
+    <div id="virtual-board"></div>
+</body>
+
+<script>
+    let pattern = new Array(255).fill(0);
+    let color = 1;
+
+    function showBoard() {
+        let board = document.getElementById("board");
+
+        board.innerHTML = "";
+
+        for(let i = 0; i < 14; i++) {
+            for(let j = 0; j < 14; j++) {
+                let cell = document.createElement("div");
+                cell.classList.add("cell");
+                board.appendChild(cell);
+            }
+            board.appendChild(document.createElement("br"));
+        }
+    }
+
+    function show() {
+        let virtualBoard = document.getElementById("virtual-board");
+        virtualBoard.innerHTML = "";
+
+        for(let i = 0; i < 15; i++) {
+            for(let j = 0; j < 15; j++) {
+                let cross = document.createElement("div");
+                cross.classList.add("cross");
+                cross.innerText = 
+                    pattern[i*15 + j] == 2 ? "⚪" : 
+                    pattern[i*15 + j] == 1 ? "⚫" : "";
+                cross.addEventListener("click", () => userMove(j, i));
+                virtualBoard.appendChild(cross);
+            }
+            virtualBoard.appendChild(document.createElement("br"));
+        }
+    }
+
+    function userMove(x, y) {
+        pattern[y * 15 + x] = color;
+        show();
+        if(check(pattern, color, y, x)) {
+            alert(color == 2 ? "⚪ is winner!" : "⚫ is winner!")
+        }
+        color = 3 - color;
+        if(willWin(pattern,color)) {
+            console.log(color == 2 ?  "⚪ will win!" : "⚫ will win!")
+        }
+        // computerMove();
+        // console.log(bestChoice(pattern, color));
+    }
+
+    // 无需遍历棋盘，只判断落子位的四个方向即可
+    function check(pattern, color, y , x) {
+        // 判断列
+        {
+            let count = 1;
+            let i = y + 1;
+            let j = x;
+            while(i < 15) {
+                if(pattern[i * 15 + j] === color) {
+                    count++;
+                    // console.log(count);
+                    if(count === 5) return true;
+                    i++;
+                } else break;
+            }
+
+            i = y - 1;
+
+            while(i >= 0) {
+                if(pattern[i * 15 + j] === color) {
+                    count++;
+                    // console.log(count);
+                    if(count === 5) return true;
+                    i--;
+                } else break;
+            }
+
+        }
+
+        // 判断行
+        {
+            let count = 1;
+            let i = y;
+            let j = x + 1;
+            while(j < 15) {
+                if(pattern[i * 15 + j] === color) {
+                    count++;
+                    // console.log(count);
+                    if(count === 5) return true;
+                    j++;
+                } else break;
+            }
+
+            j = x - 1;
+
+            while(j >= 0) {
+                if(pattern[i * 15 + j] === color) {
+                    count++;
+                    if(count === 5) return true;
+                    j--;
+                } else break;
+            }
+        }
+
+        // 判断斜向（左上->右下）
+        {
+            let count = 1;
+            let i = y + 1;
+            let j = x + 1;
+            while(i < 15 && j < 15) {
+                if(pattern[i * 15 + j] === color) {
+                    count++;
+                    if(count === 5) return true;
+                    i++;
+                    j++;
+                } else break;
+            }
+
+            i = y - 1;
+            j = x - 1;
+
+            while(i >= 0 && j >= 0) {
+                if(pattern[i * 15 + j] === color) {
+                    count++;
+                    if(count === 5) return true;
+                    i--;
+                    j--;
+                } else break;
+            }
+        }
+
+        // 判断斜向（左下->右上）
+        {
+            let count = 1;
+            let i = y + 1;
+            let j = x - 1;
+            while(i < 15 && j >= 0) {
+                if(pattern[i * 15 + j] === color) {
+                    count++;
+                    if(count === 5) return true;
+                    i++;
+                    j--;
+                } else break;
+            }
+
+            i = y - 1;
+            j = x + 1;
+
+            while(i >= 0 && j < 15) {
+                if(pattern[i * 15 + j] === color) {
+                    count++;
+                    if(count === 5) return true;
+                    i--;
+                    j++;
+                } else break;
+            }
+        }
+
+        return false;
+    }
+
+    function clone(pattern) {
+        return Object.create(pattern);
+    }
+
+    function willWin(pattern, color) {
+        for(let i = 0; i < 15; i++) {
+            for(let j = 0; j < 15; j++) {
+                let tmp = clone(pattern);
+                tmp[i * 15 + j] = color;
+                if(check(tmp, color, i, j)) return [j, i];
+            }
+        }
+        return null;
+    }
+
+    // TODO: AI 完善
+    function bestChoice(pattern, color) {
+
+    }
+
+    // console.log(bestChoice(pattern, color));
+    showBoard();
+    show();
+</script>
