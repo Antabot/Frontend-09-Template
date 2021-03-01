@@ -283,6 +283,13 @@
     function bestChoice(pattern, color, y, x) {
         let p;
 
+        if(p = willWin(pattern, color)) {
+            return {
+                point: p,
+                result: 3
+            }
+        }
+
         // 对方要赢时直接落子抢占，result 值其实无用
         if(p = willWin(pattern, 3 - color)) {
             return {
@@ -291,22 +298,16 @@
             }
         }
 
-        // 对方三连子时落子抢占
-        if(p = willWinInTwoSteps(pattern, 3 - color)) {
+
+        if(p = willWinInTwoSteps(pattern, color)) {
             return {
                 point: p,
                 result: 2
             }
         }
 
-        if(p = willWin(pattern, color)) {
-            return {
-                point: p,
-                result: 3
-            }
-        }
-
-        if(p = willWinInTwoSteps(pattern, color)) {
+        // 对方三连子时落子抢占
+        if(p = willWinInTwoSteps(pattern, 3 - color)) {
             return {
                 point: p,
                 result: 2
@@ -333,7 +334,7 @@
                     result = -r;
                     point = [j, i];
                 }
-                if(result == 1) break outer;
+                if(result == 3) break outer;
             }
         }
 
