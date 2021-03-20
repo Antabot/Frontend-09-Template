@@ -1,0 +1,59 @@
+<script>
+    let $ = Symbol("$");
+    class Trie {
+        constructor() {
+            this.root = Object.create(null);
+        }
+        insert(word) {
+            let node = this.root;
+            for(let c of word) {
+                // 用下标表示字符，对应值表示节点类型
+                if(!node[c]) 
+                    node[c] = Object.create(null);
+                // 进入下一层级，如 root['a']，下次判断 root['a'][c] 是否存在
+                node = node[c];
+            }
+            // 遍历最后一个字母节点的下标，查看是否有 node[$]，如果没有说明该字符串第一次出现
+            if(!($ in node)) {
+                /* 如此处理是为了避免某个字符串被包含自身的字符串覆盖
+                   abc 会被储存为 root['a']['b']['c'][$]，ab 则为 root['a']['b'][$]
+                   node[$] 的值为 Number，代表终结节点，值的大小表示出现的次数（0 代表 1 次）*/
+                node[$] = 0;
+            }
+            node[$]++;
+        }
+        // 使用深度优先获取最大的 node[$] 值及其对应的 word
+        most() {
+            let max = 0;
+            let maxWord = null;
+            let visit = (node, word) => {
+                if(node[$] && node[$] > max) {
+                    max = node[$];
+                    maxWord = word;
+                }
+                for(let p in node) {
+                    // 进入下一层递归
+                    visit(node[p], word + p)
+                }
+            }
+            visit(this.root, "");
+            console.log(maxWord, max);
+        }
+    }
+
+    function randomWord(length) {
+        var s = "";
+        for(let i = 0; i < length; i++) {
+            s += String.fromCharCode(Math.random() * 26 + "a".charCodeAt(0));
+        }
+        return s;
+    }
+    let trie = new Trie();
+
+    for(let i = 0; i < 100000; i++) {
+        trie.insert(randomWord(5));
+    }
+
+    trie.most();
+
+</script>
