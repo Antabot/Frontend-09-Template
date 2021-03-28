@@ -21,7 +21,7 @@
 
 <script>
     let dragable = document.getElementById("dragable");
-
+    // 全局记录基准坐标
     let baseX = 0, baseY = 0;
     dragable.addEventListener("mousedown", function(event) {
         let startX = event.clientX, startY = event.clientY;
@@ -33,6 +33,7 @@
             document.removeEventListener("mouseup", up);
         }
         let move = event => {
+            // 拖动时获取当前最近的 range 并把 dragable 插入
             let range = getNearest(event.clientX, event.clientY);
             range.insertNode(dragable);
             // dragable.style.transform = `translate(${event.clientX - startX + baseX}px, ${event.clientY - startY + baseY}px)`
@@ -43,6 +44,7 @@
 
     let ranges = [];
     let container = document.getElementById("container");
+    // 按每个字符获取 range 并保存
     for(let i = 0; i < container.childNodes[0].textContent.length; i++) {
         let range = document.createRange();
         range.setStart(container.childNodes[0], i);
@@ -56,9 +58,10 @@
         let min = Infinity;
         let nearest = null;
 
-
         for(let range of ranges) {
+            // 通过该 CSSOM API 获取该 range 相对 viewport 的位置
             let rect = range.getBoundingClientRect();
+            // rect.x/rect.y 也可以写为 rect.left/rect.top
             let distance = (rect.x - x) ** 2 + (rect.y - y) ** 2;
             if(distance < min) {
                 nearest = range;

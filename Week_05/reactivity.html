@@ -19,6 +19,7 @@
 
     let po = reactive(object);
 
+    // 通过回调函数设置数据到 DOM 一侧的绑定
     effect(() => {
         document.getElementById('r').value = po.r;
     })
@@ -33,6 +34,7 @@
         document.getElementById('color').style.backgroundColor = `rgb(${po.r}, ${po.g}, ${po.b})`;
     })
 
+    // 通过 EventListener 设置 DOM 到数据一侧的绑定
     document.getElementById('r').addEventListener("input", event => po.r = event.target.value);
     document.getElementById('g').addEventListener("input", event => po.g = event.target.value);
     document.getElementById('b').addEventListener("input", event => po.b = event.target.value);
