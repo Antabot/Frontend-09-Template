@@ -1,0 +1,9 @@
+<Expression>::=<AdditiveExpression><EOF>
+<AdditiveExpression>::=<MultiplicativeExpression>|
+	<AdditiveExpression>"+"<MultiplicativeExpression>|
+	<AdditiveExpression>"-"<MultiplicativeExpression>
+<MultiplicativeExpression>::=<PrimaryExpression>|
+	<MultiplicativeExpression>"*"<PrimaryExpression>|
+	<MultiplicativeExpression>"/"<PrimaryExpression>
+<PrimaryExpression>::=<Number>|
+	"("<AdditiveExpression>")"
