@@ -86,15 +86,51 @@
         root.label = 'Realm';
         root.children = [];
 
-        let id = 1;
+        let func = {};
+        func.id = '2';
+        func.type = 'image';
+        func.label = 'Function(click to expand)'
+        func.collapsed = true;
+        func.children = [];
+
+        let object = {};
+        object.id = '3';
+        object.type = 'image';
+        object.label = 'Intrinsic Object';
+        object.collapsed = false;
+        object.children = [];
+
+        let boxObject = {};
+        boxObject.id = '4';
+        boxObject.type = 'image';
+        boxObject.label = 'Boxing Object';
+        boxObject.collapsed = false;
+        boxObject.children = [];
+
+        let deprecated = {};
+        deprecated.id = '5';
+        deprecated.type = 'image';
+        deprecated.label = 'Deprecated';
+        deprecated.collapsed = false;
+        deprecated.children = [];
+
+        root.children.push(func);
+        root.children.push(object);
+        root.children.push(boxObject);
+        root.children.push(deprecated);
+
+        let id = 5;
         for(let o of objects) {
             let obj = {};
             id++;
             obj.id = id.toString();
-            obj.type = 'image';
+            obj.type = 'text';
             obj.label = o.name ? o.name : Object.prototype.toString.call(o);
-            root.children.push(obj);
-            // break;
+            if (obj.label[0] >= 'A' && obj.label[0] <= 'Z') object.children.push(obj);
+            else if (obj.label[0] >= 'a' && obj.label[0] <= 'z') func.children.push(obj);
+            else if (obj.label[0] === '[') boxObject.children.push(obj);
+            else if (obj.label[0] === '_') deprecated.children.push(obj);
+            else root.children.push(obj);
         }
         // console.log(JSON.stringify(treedata));
         treedata = root;
@@ -107,7 +143,18 @@
             pixelRatio: 2,
             linkCenter: true,
             modes: {
-                default: ['drag-canvas', 'zoom-canvas', 'dice-mindmap']
+            	default: [
+          			{
+			            type: 'collapse-expand',
+			            // onChange: function onChange(item, collapsed) {
+			            //   const data = item.getModel();
+			            //   data.collapsed = collapsed;
+			            //   return true;
+           				// },
+		          	},
+		          	'drag-canvas',
+		          	'zoom-canvas',
+		        ],
             },
             defaultNode: {
                 size: 30
@@ -139,7 +186,7 @@
                     return 10;
                 },
                 getHGap: function getHGap() {
-                    return 150;
+                    return 50;
                 }
             },
             defaultEdge: {
@@ -150,18 +197,29 @@
             },
         });
         //定义节点
+        let centerX = 0;
         graph.node(function(node) {
+        	if (node.id === 'Modeling Methods') {
+       			centerX = node.x;
+      		}
+
             return {
-                size: 36,
+                size: 15,
                 anchorPoints: [[0, 0.5], [1, 0.5]],
                 style: {
                     fill: '#40a9ff',
                     stroke: '#096dd9'
                 },
                 //label: node.id,
-                labelCfg: {
-                    position: 'right'
-                }
+		        labelCfg: {
+		          position:
+		            node.children && node.children.length > 0
+		              ? 'left'
+		              : node.x > centerX
+		              ? 'right'
+		              : 'left',
+		          offset: 5,
+		        },
             };
         });
         graph.data(treedata);
