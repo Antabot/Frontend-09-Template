@@ -166,9 +166,47 @@ Number String Boolean Symbol`new Object(Symbol('a'))`。
 
 ![宏任务与微任务](https://img-blog.csdnimg.cn/20210412214300614.png#pic_center)
 
+### 3.2 事件循环
+
+wait->getcode->execute->wait
+
 ### 3.2 JS 函数调用
 
-#### 3.2.1
+#### 3.2.1 Execution Context
+
+执行一个语句的时候需要的所有信息会保存在执行上下文中，执行上下文保存在执行上下文栈中，栈顶即当前执行上下文。
+
+执行上下文组成：
+
+![执行上下文](https://img-blog.csdnimg.cn/20210412215042972.png#pic_center)
+
+一个执行上下文不一定有以上全部的内容。
+
+#### 3.2.2 Lexical Environment
+
+- this
+- new.target
+- super
+- 变量
+
+#### 3.2.3 VariableEnvironment
+
+历史包袱，仅处理 var 声明。但无法处理 eval 里的 var，因此仍需借助 lexical Environment。
+
+#### 3.2.4 Environment Record
+
+![Environment Record](https://img-blog.csdnimg.cn/20210412215421741.png#pic_center)
+
+#### 3.2.5 Closure
+
+根据 ES 定义，闭包即为函数。
+
+但在某些场景下，闭包指有以下特征的函数：
+
+- 即使创建它的上下文已经销毁，它仍然存在（比如，内部函数从父函数中返回）
+- 在代码中引用了自由变量
+
+> “作用域链” 这个说法在 ES 2018 后已经不再提及。
 
 #### 3.2.2 Realm
 
